@@ -144,14 +144,17 @@ lib/
 
 ## 7. Screenshot Aplikasi
 
-> Tempelkan tangkapan layar aplikasi pada folder `screenshots/` saat pengumpulan akhir:
-> - `screenshots/01_home_dashboard.png` — Home/Dashboard Screen
-> - `screenshots/02_catalog_api_list.png` — Katalog Grosir REST API (List/Grid)
-> - `screenshots/03_catalog_detail.png` — Detail Produk & Simulasi Kulakan
-> - `screenshots/04_create_inventory.png` — Form Tambah Stok & Validasi
-> - `screenshots/05_inventory_database.png` — Daftar Stok Lapak dari Database
-> - `screenshots/06_edit_and_delete_dialog.png` — Form Edit & Dialog Konfirmasi Hapus
-> - `screenshots/07_responsive_wide.png` — Tampilan Wide/Expanded dengan NavigationRail
+| Beranda (Dashboard) | Katalog Grosir REST API |
+| --- | --- |
+| ![Beranda](screenshots/01_home_dashboard.png) | ![Katalog](screenshots/02_catalog_api_list.png) |
+| Detail Produk dan Simulasi Kulakan | Tambah Stok (Create) |
+| ![Detail](screenshots/03_catalog_detail.png) | ![Tambah](screenshots/04_create_inventory.png) |
+| Stok Lapak dari Database (Read) | Edit Stok (Update) |
+| ![Stok](screenshots/05_inventory_database.png) | ![Edit](screenshots/06_edit_form.png) |
+| Dialog Konfirmasi Hapus (Delete) | Layout Responsif Expanded |
+| ![Hapus](screenshots/06b_delete_dialog.png) | ![Responsif](screenshots/07_responsive_wide.png) |
+| Profil dan Kalkulator Dus | Penanganan Error REST API |
+| ![Profil](screenshots/08_profile.png) | ![Error](screenshots/09_api_error_state.png) |
 
 ---
 
