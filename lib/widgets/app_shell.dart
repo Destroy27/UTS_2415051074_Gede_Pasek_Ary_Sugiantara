@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../core/breakpoint.dart';
 import '../core/student_identity.dart';
-import 'identity_header.dart';
 
 /// Reusable Widget #3: Kerangka navigasi responsif aplikasi LapakPintar.
 ///
@@ -28,29 +28,29 @@ class AppShell extends StatelessWidget {
 
   static const List<_NavDestination> _destinations = <_NavDestination>[
     _NavDestination(
-      icon: Icons.storefront_outlined,
-      selectedIcon: Icons.storefront,
+      icon: Icons.home_outlined,
+      selectedIcon: Icons.home_rounded,
       label: 'Beranda',
     ),
     _NavDestination(
       icon: Icons.local_shipping_outlined,
-      selectedIcon: Icons.local_shipping,
-      label: 'Katalog API',
+      selectedIcon: Icons.local_shipping_rounded,
+      label: 'Katalog',
     ),
     _NavDestination(
       icon: Icons.inventory_2_outlined,
-      selectedIcon: Icons.inventory_2,
-      label: 'Stok Lapak',
+      selectedIcon: Icons.inventory_2_rounded,
+      label: 'Stok',
     ),
     _NavDestination(
       icon: Icons.add_business_outlined,
-      selectedIcon: Icons.add_business,
-      label: 'Tambah Stok',
+      selectedIcon: Icons.add_business_rounded,
+      label: 'Tambah',
     ),
     _NavDestination(
-      icon: Icons.person_outline,
-      selectedIcon: Icons.person,
-      label: 'Profil & Laba',
+      icon: Icons.person_outline_rounded,
+      selectedIcon: Icons.person_rounded,
+      label: 'Profil',
     ),
   ];
 
@@ -64,75 +64,122 @@ class AppShell extends StatelessWidget {
 
         if (category == LayoutCategory.expanded) {
           return Scaffold(
+            backgroundColor: const Color(0xFFF8FAF9),
             body: Row(
               children: <Widget>[
-                NavigationRail(
-                  extended: constraints.maxWidth >= 1080,
-                  selectedIndex: currentIndex,
-                  onDestinationSelected: onDestinationSelected,
-                  leading: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 8,
-                    ),
-                    child: Column(
-                      children: <Widget>[
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: colors.primary,
-                          foregroundColor: colors.onPrimary,
-                          child: const Icon(Icons.store, size: 22),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          student.appName,
-                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
+                Container(
+                  width: constraints.maxWidth >= 1080 ? 240 : 72,
+                  color: Colors.white,
+                  child: Column(
+                    children: <Widget>[
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: constraints.maxWidth >= 1080
+                              ? MainAxisAlignment.start
+                              : MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
                                 color: colors.primary,
+                                borderRadius: BorderRadius.circular(10),
                               ),
+                              child: const Icon(
+                                Icons.store_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                            if (constraints.maxWidth >= 1080) ...<Widget>[
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  student.appName,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFF1A1D1A),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
-                        const SizedBox(height: 6),
-                        LayoutBadge(category: category),
-                      ],
-                    ),
-                  ),
-                  trailing: Expanded(
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Chip(
-                          avatar: Icon(
-                            isCloudConnected ? Icons.cloud_done : Icons.storage,
-                            size: 16,
-                            color: isCloudConnected
-                                ? Colors.green.shade700
-                                : colors.primary,
-                          ),
-                          label: Text(
-                            isCloudConnected ? 'Supabase Cloud' : 'Mode Lokal',
-                            style: const TextStyle(fontSize: 11),
+                      ),
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: NavigationRail(
+                          extended: constraints.maxWidth >= 1080,
+                          selectedIndex: currentIndex,
+                          onDestinationSelected: onDestinationSelected,
+                          backgroundColor: Colors.transparent,
+                          indicatorColor: colors.primary.withValues(alpha: 0.08),
+                          labelType: constraints.maxWidth >= 1080
+                              ? NavigationRailLabelType.none
+                              : NavigationRailLabelType.all,
+                          destinations: List<NavigationRailDestination>.generate(
+                            _destinations.length,
+                            (int index) {
+                              final _NavDestination d = _destinations[index];
+                              return NavigationRailDestination(
+                                icon: _buildBadgedIcon(index, d.icon),
+                                selectedIcon: _buildBadgedIcon(index, d.selectedIcon),
+                                label: Text(
+                                  d.label,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  labelType: constraints.maxWidth >= 1080
-                      ? NavigationRailLabelType.none
-                      : NavigationRailLabelType.all,
-                  destinations: List<NavigationRailDestination>.generate(
-                    _destinations.length,
-                    (int index) {
-                      final _NavDestination d = _destinations[index];
-                      return NavigationRailDestination(
-                        icon: _buildBadgedIcon(index, d.icon),
-                        selectedIcon: _buildBadgedIcon(index, d.selectedIcon),
-                        label: Text(d.label),
-                      );
-                    },
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: constraints.maxWidth >= 1080
+                            ? Row(
+                                children: <Widget>[
+                                  Icon(
+                                    isCloudConnected
+                                        ? Icons.cloud_done_outlined
+                                        : Icons.storage_outlined,
+                                    size: 16,
+                                    color: isCloudConnected
+                                        ? Colors.green.shade600
+                                        : const Color(0xFF6B7280),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    isCloudConnected
+                                        ? 'Supabase Cloud'
+                                        : 'Mode Lokal',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: const Color(0xFF6B7280),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Icon(
+                                isCloudConnected
+                                    ? Icons.cloud_done_outlined
+                                    : Icons.storage_outlined,
+                                size: 18,
+                                color: isCloudConnected
+                                    ? Colors.green.shade600
+                                    : const Color(0xFF6B7280),
+                              ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                   ),
                 ),
-                const VerticalDivider(width: 1, thickness: 1),
+                const VerticalDivider(width: 1, thickness: 1, color: Color(0xFFE5E7EB)),
                 Expanded(child: activePage),
               ],
             ),
@@ -140,6 +187,7 @@ class AppShell extends StatelessWidget {
         }
 
         return Scaffold(
+          backgroundColor: const Color(0xFFF8FAF9),
           body: activePage,
           bottomNavigationBar: NavigationBar(
             selectedIndex: currentIndex,
@@ -165,12 +213,14 @@ class AppShell extends StatelessWidget {
     if (index == 1 && bookmarkBadgeCount > 0) {
       return Badge.count(
         count: bookmarkBadgeCount,
+        backgroundColor: const Color(0xFF0B6E4F),
         child: Icon(iconData),
       );
     }
     if (index == 2 && inventoryBadgeCount > 0) {
       return Badge.count(
         count: inventoryBadgeCount,
+        backgroundColor: Colors.orange.shade600,
         child: Icon(iconData),
       );
     }

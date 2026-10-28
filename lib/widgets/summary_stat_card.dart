@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Reusable Widget #2: Kartu Metrik Statistik Lapak Pedagang pada Dashboard.
 class SummaryStatCard extends StatelessWidget {
@@ -21,21 +22,15 @@ class SummaryStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme colors = theme.colorScheme;
+    final ColorScheme colors = Theme.of(context).colorScheme;
     final Color effectiveColor = accentColor ?? colors.primary;
 
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.7)),
-      ),
-      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -45,38 +40,42 @@ class SummaryStatCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: effectiveColor.withValues(alpha: 0.14),
+                      color: effectiveColor.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(icon, size: 20, color: effectiveColor),
+                    child: Icon(icon, size: 18, color: effectiveColor),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       title,
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF6B7280),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Text(
                 value,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colors.onSurface,
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF1A1D1A),
+                  height: 1,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colors.onSurfaceVariant,
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: const Color(0xFF9CA3AF),
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

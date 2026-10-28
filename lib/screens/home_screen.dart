@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../core/breakpoint.dart';
@@ -13,8 +14,7 @@ import 'add_inventory_screen.dart';
 import 'catalog_detail_screen.dart';
 import 'edit_inventory_screen.dart';
 
-/// Screen #1 (Home / Dashboard): Ringkasan bisnis pedagang UMKM, peringatan
-/// stok menipis (Perlu Kulakan), serta rekomendasi produk grosir dari REST API.
+/// Screen #1 (Home / Dashboard): Ringkasan bisnis pedagang UMKM.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
     super.key,
@@ -37,19 +37,19 @@ class HomeScreen extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final LayoutCategory category = layoutCategoryOf(constraints.maxWidth);
-        final int statCols = category == LayoutCategory.compact
-            ? 2
-            : (category == LayoutCategory.medium ? 2 : 4);
+        final int statCols = category == LayoutCategory.compact ? 2 : 4;
         final int catalogCols = gridColumnsFor(category);
 
         return Scaffold(
+          backgroundColor: const Color(0xFFF8FAF9),
           appBar: AppBar(
-            title: const Text('LapakPintar • Dashboard Pedagang'),
+            title: const Text('Dashboard'),
             actions: <Widget>[
               IconButton(
-                tooltip: 'Segarkan Semua Data',
+                tooltip: 'Segarkan Data',
                 onPressed: () => provider.initializeData(),
-                icon: const Icon(Icons.sync),
+                icon: const Icon(Icons.refresh_rounded, size: 20),
+                color: const Color(0xFF6B7280),
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 12),
@@ -58,10 +58,11 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           body: RefreshIndicator(
+            color: const Color(0xFF0B6E4F),
             onRefresh: () => provider.initializeData(),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1120),
@@ -71,15 +72,16 @@ class HomeScreen extends StatelessWidget {
                       const IdentityHeader(),
                       const SizedBox(height: 16),
                       _buildHeroBanner(context, provider),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       Text(
-                        'Ringkasan Keuangan & Stok Warung',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        'Ringkasan Keuangan & Stok',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF1A1D1A),
+                        ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       GridView.count(
                         crossAxisCount: statCols,
                         shrinkWrap: true,
@@ -87,7 +89,7 @@ class HomeScreen extends StatelessWidget {
                         mainAxisSpacing: 10,
                         crossAxisSpacing: 10,
                         childAspectRatio:
-                            category == LayoutCategory.compact ? 1.38 : 1.75,
+                            category == LayoutCategory.compact ? 1.35 : 1.75,
                         children: <Widget>[
                           SummaryStatCard(
                             title: 'Total Modal Stok',
@@ -95,18 +97,18 @@ class HomeScreen extends StatelessWidget {
                               summary.totalCapitalIdr,
                             ),
                             subtitle:
-                                '${summary.totalSkuCount} jenis barang (${summary.totalUnitsInStock} unit)',
+                                '${summary.totalSkuCount} jenis • ${summary.totalUnitsInStock} unit',
                             icon: Icons.account_balance_wallet_outlined,
                             onTap: () => onNavigateTab(2),
                           ),
                           SummaryStatCard(
-                            title: 'Potensi Laba Bersih',
+                            title: 'Potensi Laba',
                             value:
                                 '+${CurrencyFormatter.formatCompactRupiah(summary.totalProfitPotentialIdr)}',
                             subtitle:
-                                'Rata-rata margin +${summary.averageMarginPercent.toStringAsFixed(1)}%',
+                                'Margin rata-rata ${summary.averageMarginPercent.toStringAsFixed(1)}%',
                             icon: Icons.trending_up_rounded,
-                            accentColor: Colors.green.shade700,
+                            accentColor: const Color(0xFF059669),
                             onTap: () => onNavigateTab(2),
                           ),
                           SummaryStatCard(
@@ -114,21 +116,21 @@ class HomeScreen extends StatelessWidget {
                             value: '${summary.needsRestockCount} Barang',
                             subtitle: summary.needsRestockCount > 0
                                 ? 'Segera belanja ke supplier'
-                                : 'Seluruh stok warung aman',
+                                : 'Semua stok aman',
                             icon: Icons.notification_important_outlined,
-                            accentColor: Colors.orange.shade800,
+                            accentColor: Colors.orange.shade700,
                             onTap: () {
                               provider.setSelectedStockStatus('Perlu Kulakan');
                               onNavigateTab(2);
                             },
                           ),
                           SummaryStatCard(
-                            title: 'Pantauan Grosir API',
+                            title: 'Pantauan Grosir',
                             value: '${provider.bookmarkCount} Produk',
                             subtitle:
-                                'Dari ${provider.catalogProducts.length} katalog supplier',
+                                'Dari ${provider.catalogProducts.length} katalog',
                             icon: Icons.bookmark_added_outlined,
-                            accentColor: Theme.of(context).colorScheme.tertiary,
+                            accentColor: const Color(0xFF2563EB),
                             onTap: () {
                               provider.setOnlyBookmarkedCatalog(true);
                               onNavigateTab(1);
@@ -136,37 +138,33 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      _buildRestockSection(context, restockItems),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
+                      _buildRestockSection(context, restockItems, provider),
+                      const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  'Rekomendasi Kulakan Grosir (REST API)',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  'Harga modal supplier terkini untuk stok warung Anda',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
+                          Text(
+                            'Rekomendasi Kulakan',
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF1A1D1A),
                             ),
                           ),
-                          TextButton.icon(
+                          TextButton(
                             onPressed: () {
                               provider.resetCatalogFilters();
                               onNavigateTab(1);
                             },
-                            icon: const Icon(Icons.arrow_forward, size: 16),
-                            label: const Text('Lihat Semua'),
+                            child: Text(
+                              'Lihat Semua →',
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF0B6E4F),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -174,13 +172,22 @@ class HomeScreen extends StatelessWidget {
                       if (provider.isLoadingCatalog)
                         const Padding(
                           padding: EdgeInsets.all(24),
-                          child: Center(child: CircularProgressIndicator()),
+                          child: Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2.5),
+                            ),
+                          ),
                         )
                       else if (featuredCatalog.isEmpty)
                         Card(
                           child: ListTile(
-                            leading: const Icon(Icons.cloud_off),
-                            title: const Text('Katalog belum dimuat'),
+                            leading: const Icon(Icons.cloud_off_outlined),
+                            title: Text(
+                              'Katalog belum dimuat',
+                              style: GoogleFonts.inter(fontSize: 13),
+                            ),
                             trailing: TextButton(
                               onPressed: () => provider.loadCatalog(),
                               child: const Text('Muat Ulang'),
@@ -197,7 +204,7 @@ class HomeScreen extends StatelessWidget {
                             crossAxisCount: catalogCols,
                             mainAxisSpacing: 10,
                             crossAxisSpacing: 10,
-                            mainAxisExtent: 126,
+                            mainAxisExtent: 84,
                           ),
                           itemBuilder: (BuildContext context, int index) {
                             final SupplierProduct product =
@@ -217,72 +224,64 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildHeroBanner(BuildContext context, MerchantProvider provider) {
-    final ColorScheme colors = Theme.of(context).colorScheme;
-
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerHighest.withValues(alpha: 0.65),
+        color: const Color(0xFF0B6E4F),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.outlineVariant),
       ),
-      child: Wrap(
-        spacing: 16,
-        runSpacing: 12,
-        alignment: WrapAlignment.spaceBetween,
-        crossAxisAlignment: WrapCrossAlignment.center,
+      child: Row(
         children: <Widget>[
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 560),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Icon(Icons.verified_outlined,
-                        size: 18, color: colors.primary),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Solusi Digital Pedagang & Warung UMKM',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: colors.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
+                Text(
+                  'LapakPintar',
+                  style: GoogleFonts.inter(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    height: 1,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Cek harga modal grosir dari REST API Supplier & kelola catatan stok serta keuntungan warung pada Database Supabase.',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  'Cek harga modal grosir dari REST API & kelola stok warung pada database Supabase.',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: Colors.white.withValues(alpha: 0.85),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: <Widget>[
+                    _HeroButton(
+                      label: 'Cek Harga Grosir',
+                      icon: Icons.local_shipping_outlined,
+                      isPrimary: false,
+                      onPressed: () => onNavigateTab(1),
+                    ),
+                    const SizedBox(width: 10),
+                    _HeroButton(
+                      label: 'Catat Stok Baru',
+                      icon: Icons.add,
+                      isPrimary: true,
+                      onPressed: () {
+                        Navigator.of(context).push<void>(
+                          MaterialPageRoute<void>(
+                            builder: (_) =>
+                                const AddInventoryScreen(isPushedRoute: true),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
-          ),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: <Widget>[
-              OutlinedButton.icon(
-                onPressed: () => onNavigateTab(1),
-                icon: const Icon(Icons.local_shipping_outlined),
-                label: const Text('Cek Harga Grosir'),
-              ),
-              FilledButton.icon(
-                onPressed: () {
-                  Navigator.of(context).push<void>(
-                    MaterialPageRoute<void>(
-                      builder: (_) =>
-                          const AddInventoryScreen(isPushedRoute: true),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Catat Stok Baru'),
-              ),
-            ],
           ),
         ],
       ),
@@ -292,15 +291,9 @@ class HomeScreen extends StatelessWidget {
   Widget _buildRestockSection(
     BuildContext context,
     List<MerchantItem> restockItems,
+    MerchantProvider provider,
   ) {
-    final ColorScheme colors = Theme.of(context).colorScheme;
-
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: colors.outlineVariant),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -308,63 +301,172 @@ class HomeScreen extends StatelessWidget {
           children: <Widget>[
             Row(
               children: <Widget>[
-                Icon(
-                  Icons.assignment_late_outlined,
-                  color: Colors.orange.shade800,
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.assignment_late_outlined,
+                    size: 18,
+                    color: Colors.orange.shade700,
+                  ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Daftar Belanja / Barang Perlu Kulakan Segera',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    'Daftar Belanja / Perlu Kulakan',
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1A1D1A),
+                    ),
                   ),
                 ),
                 TextButton(
                   onPressed: () => onNavigateTab(2),
-                  child: const Text('Kelola Stok'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF0B6E4F),
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(0, 32),
+                  ),
+                  child: Text(
+                    'Kelola →',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             if (restockItems.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
-                  'Semua stok barang di lapak dalam kondisi aman! Tidak ada barang yang habis.',
+                  'Semua stok barang dalam kondisi aman.',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: const Color(0xFF6B7280),
+                  ),
                 ),
               )
             else
               ...restockItems.map((MerchantItem item) {
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.orange.shade100,
-                    foregroundColor: Colors.orange.shade900,
-                    child: Text('${item.stockQty}'),
-                  ),
-                  title: Text(
-                    item.productTitle,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: Text(
-                    'Status: ${item.restockStatus} • Modal: ${CurrencyFormatter.formatRupiah(item.buyPrice)}',
-                  ),
-                  trailing: TextButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push<void>(
-                        MaterialPageRoute<void>(
-                          builder: (_) => EditInventoryScreen(item: item),
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade50,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.edit_outlined, size: 16),
-                    label: const Text('Update'),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${item.stockQty}',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.orange.shade800,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              item.productTitle,
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF1A1D1A),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              item.restockStatus,
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: const Color(0xFF9CA3AF),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push<void>(
+                            MaterialPageRoute<void>(
+                              builder: (_) => EditInventoryScreen(item: item),
+                            ),
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFF0B6E4F),
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          minimumSize: const Size(0, 30),
+                        ),
+                        child: Text(
+                          'Update',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               }),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroButton extends StatelessWidget {
+  const _HeroButton({
+    required this.label,
+    required this.icon,
+    required this.isPrimary,
+    required this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool isPrimary;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        backgroundColor: isPrimary ? Colors.white : Colors.transparent,
+        foregroundColor: isPrimary ? const Color(0xFF0B6E4F) : Colors.white,
+        side: BorderSide(
+          color: isPrimary ? Colors.white : Colors.white.withValues(alpha: 0.4),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      ),
+      icon: Icon(icon, size: 16),
+      label: Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
@@ -381,12 +483,6 @@ class _FeaturedCatalogTile extends StatelessWidget {
     final ColorScheme colors = Theme.of(context).colorScheme;
 
     return Card(
-      elevation: 0,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.7)),
-      ),
       child: InkWell(
         onTap: () {
           Navigator.of(context).push<void>(
@@ -395,13 +491,14 @@ class _FeaturedCatalogTile extends StatelessWidget {
             ),
           );
         },
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
             children: <Widget>[
               Container(
-                width: 56,
-                height: 56,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color: colors.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(10),
@@ -412,13 +509,15 @@ class _FeaturedCatalogTile extends StatelessWidget {
                         product.thumbnail,
                         fit: BoxFit.cover,
                         errorBuilder: (_, _, _) => Icon(
-                          Icons.local_shipping_outlined,
+                          Icons.inventory_2_outlined,
                           color: colors.primary,
+                          size: 20,
                         ),
                       )
                     : Icon(
-                        Icons.local_shipping_outlined,
+                        Icons.inventory_2_outlined,
                         color: colors.primary,
+                        size: 20,
                       ),
               ),
               const SizedBox(width: 12),
@@ -429,31 +528,38 @@ class _FeaturedCatalogTile extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       product.title,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1A1D1A),
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Modal: ${CurrencyFormatter.formatRupiah(product.wholesalePriceIdr)}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      CurrencyFormatter.formatRupiah(product.wholesalePriceIdr),
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: colors.primary,
+                      ),
                     ),
-                    const SizedBox(height: 2),
                     Text(
-                      'Est. Laba +${CurrencyFormatter.formatRupiah(product.estimatedProfitPerUnit)}/unit',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.green.shade700,
-                          ),
+                      '+${CurrencyFormatter.formatRupiah(product.estimatedProfitPerUnit)} /unit',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: const Color(0xFF059669),
+                      ),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right),
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 20,
+                color: Color(0xFF9CA3AF),
+              ),
             ],
           ),
         ),

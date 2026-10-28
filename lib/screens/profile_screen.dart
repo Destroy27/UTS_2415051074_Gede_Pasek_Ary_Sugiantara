@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../config/api_config.dart';
@@ -9,9 +10,7 @@ import '../core/student_identity.dart';
 import '../providers/merchant_provider.dart';
 import '../widgets/identity_header.dart';
 
-/// Screen #7 (Profile / About + Fitur Kreatif Kalkulator Laba Pedagang):
-/// Menampilkan identitas mahasiswa, arsitektur aplikasi, status koneksi API
-/// & Supabase, serta kalkulator interaktif simulasi harga grosir & target laba.
+/// Screen #7: Profil Mahasiswa & Kalkulator Pecah Harga Dus.
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -40,8 +39,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final bool isWide = category != LayoutCategory.compact;
 
         return Scaffold(
+          backgroundColor: const Color(0xFFF8FAF9),
           appBar: AppBar(
-            title: const Text('Profil Mahasiswa & Kalkulator Dagang'),
+            title: const Text('Profil & Kalkulator'),
             actions: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(right: 12),
@@ -50,10 +50,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 980),
+                constraints: const BoxConstraints(maxWidth: 960),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -66,137 +66,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Expanded(child: _buildStudentCard(context)),
                           const SizedBox(width: 16),
                           Expanded(
-                            child: _buildTechArchitectureCard(
-                              context,
-                              provider,
-                            ),
+                            child: _buildTechCard(context, provider),
                           ),
                         ],
                       )
                     else ...<Widget>[
                       _buildStudentCard(context),
                       const SizedBox(height: 16),
-                      _buildTechArchitectureCard(context, provider),
+                      _buildTechCard(context, provider),
                     ],
                     const SizedBox(height: 16),
-                    Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant,
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Icon(
-                                  Icons.calculate_rounded,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    'Fitur Kreatif: Kalkulator Pecah Harga Dus / Renteng Pedagang',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Bantu pedagang menghitung harga jual eceran per biji saat membeli barang secara grosir per dus/pak:',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            const SizedBox(height: 14),
-                            Text(
-                              'Harga Beli 1 Dus / Pak: ${CurrencyFormatter.formatRupiah(_modalPerPack)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Slider(
-                              value: _modalPerPack,
-                              min: 15000,
-                              max: 500000,
-                              divisions: 97,
-                              label:
-                                  CurrencyFormatter.formatRupiah(_modalPerPack),
-                              onChanged: (double v) =>
-                                  setState(() => _modalPerPack = v),
-                            ),
-                            Text(
-                              'Isi Barang per Dus / Renteng: ${_unitsPerPack.round()} pcs',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Slider(
-                              value: _unitsPerPack,
-                              min: 2,
-                              max: 48,
-                              divisions: 46,
-                              label: '${_unitsPerPack.round()} pcs',
-                              onChanged: (double v) =>
-                                  setState(() => _unitsPerPack = v),
-                            ),
-                            Text(
-                              'Target Margin Keuntungan: ${_desiredMarginPercent.round()}%',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Slider(
-                              value: _desiredMarginPercent,
-                              min: 5,
-                              max: 60,
-                              divisions: 55,
-                              label: '${_desiredMarginPercent.round()}%',
-                              onChanged: (double v) =>
-                                  setState(() => _desiredMarginPercent = v),
-                            ),
-                            const Divider(height: 20),
-                            Wrap(
-                              spacing: 20,
-                              runSpacing: 12,
-                              alignment: WrapAlignment.spaceBetween,
-                              children: <Widget>[
-                                _ResultBox(
-                                  label: 'Modal per Pcs',
-                                  value: CurrencyFormatter.formatRupiah(
-                                    unitModal,
-                                  ),
-                                ),
-                                _ResultBox(
-                                  label: 'Saran Jual Eceran / Pcs',
-                                  value: CurrencyFormatter.formatRupiah(
-                                    roundedSellUnit,
-                                  ),
-                                  highlight: true,
-                                ),
-                                _ResultBox(
-                                  label: 'Untung per Pcs',
-                                  value:
-                                      '+${CurrencyFormatter.formatRupiah(profitPerUnit)}',
-                                ),
-                                _ResultBox(
-                                  label: 'Total Untung 1 Dus',
-                                  value:
-                                      '+${CurrencyFormatter.formatRupiah(profitPerPack)}',
-                                  highlight: true,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+                    _buildCalculatorCard(
+                      context,
+                      unitModal,
+                      roundedSellUnit,
+                      profitPerUnit,
+                      profitPerPack,
                     ),
                   ],
                 ),
@@ -209,90 +94,221 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildStudentCard(BuildContext context) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Identitas Mahasiswa (UTS)',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Identitas Mahasiswa',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF1A1D1A),
             ),
-            const Divider(height: 20),
-            _InfoRow(label: 'Nama Lengkap', value: studentName),
-            _InfoRow(label: 'NIM', value: studentId),
-            _InfoRow(label: 'Kelas', value: studentClass),
-            _InfoRow(label: 'Program Studi', value: studentProgram),
-            _InfoRow(label: 'Nama Project', value: student.appName),
-            _InfoRow(label: 'Tema Aplikasi', value: student.appTheme),
-            _InfoRow(
-              label: 'Dosen Pengampu',
-              value: 'Dr. Ir. I Ketut Resika Arthana, S.T., M.Kom',
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 12),
+          _InfoRow(label: 'Nama', value: studentName),
+          _InfoRow(label: 'NIM', value: studentId),
+          _InfoRow(label: 'Kelas', value: studentClass),
+          _InfoRow(label: 'Program Studi', value: studentProgram),
+          _InfoRow(label: 'Project', value: student.appName),
+          _InfoRow(label: 'Tema', value: student.appTheme),
+          _InfoRow(label: 'Dosen', value: 'Dr. Ir. I Ketut Resika Arthana, S.T., M.Kom'),
+        ],
       ),
     );
   }
 
-  Widget _buildTechArchitectureCard(
-    BuildContext context,
-    MerchantProvider provider,
-  ) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+  Widget _buildTechCard(BuildContext context, MerchantProvider provider) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Spesifikasi Teknis & Integrasi',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Spesifikasi Teknis',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF1A1D1A),
+            ),
+          ),
+          const SizedBox(height: 12),
+          const _InfoRow(
+            label: 'Arsitektur',
+            value: 'UI → Provider → Repository → Service → API/DB',
+          ),
+          const _InfoRow(
+            label: 'State Mgmt',
+            value: 'Provider + ChangeNotifier',
+          ),
+          _InfoRow(
+            label: 'REST API',
+            value: ApiConfig.productsEndpoint,
+          ),
+          _InfoRow(
+            label: 'Tabel DB',
+            value: SupabaseConfig.inventoryTable,
+          ),
+          _InfoRow(
+            label: 'Status DB',
+            value: provider.isCloudDatabaseActive
+                ? 'Supabase Cloud'
+                : 'Mode Lokal Aktif',
+          ),
+          const _InfoRow(
+            label: 'Screen',
+            value: '7 Screen Fungsional',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalculatorCard(
+    BuildContext context,
+    int unitModal,
+    int roundedSellUnit,
+    int profitPerUnit,
+    int profitPerPack,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              const Icon(
+                Icons.calculate_rounded,
+                size: 20,
+                color: Color(0xFF0B6E4F),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Kalkulator Pecah Harga Dus / Renteng',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF1A1D1A),
                   ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Hitung harga jual eceran per pcs saat beli barang grosir per dus/pak.',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: const Color(0xFF9CA3AF),
             ),
-            const Divider(height: 20),
-            const _InfoRow(
-              label: 'Arsitektur',
-              value: 'UI → Provider → Repository → Service → API/DB',
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Harga Beli 1 Dus: ${CurrencyFormatter.formatRupiah(_modalPerPack)}',
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF1A1D1A),
             ),
-            const _InfoRow(
-              label: 'State Management',
-              value: 'Provider + ChangeNotifier (MerchantProvider)',
+          ),
+          Slider(
+            value: _modalPerPack,
+            min: 15000,
+            max: 500000,
+            divisions: 97,
+            activeColor: const Color(0xFF0B6E4F),
+            label: CurrencyFormatter.formatRupiah(_modalPerPack),
+            onChanged: (double v) => setState(() => _modalPerPack = v),
+          ),
+          Text(
+            'Isi per Dus: ${_unitsPerPack.round()} pcs',
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF1A1D1A),
             ),
-            const _InfoRow(
-              label: 'REST API (GET)',
-              value: ApiConfig.productsEndpoint,
+          ),
+          Slider(
+            value: _unitsPerPack,
+            min: 2,
+            max: 48,
+            divisions: 46,
+            activeColor: const Color(0xFF0B6E4F),
+            label: '${_unitsPerPack.round()} pcs',
+            onChanged: (double v) => setState(() => _unitsPerPack = v),
+          ),
+          Text(
+            'Target Margin: ${_desiredMarginPercent.round()}%',
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF1A1D1A),
             ),
-            _InfoRow(
-              label: 'Tabel Supabase',
-              value: SupabaseConfig.inventoryTable,
+          ),
+          Slider(
+            value: _desiredMarginPercent,
+            min: 5,
+            max: 60,
+            divisions: 55,
+            activeColor: const Color(0xFF0B6E4F),
+            label: '${_desiredMarginPercent.round()}%',
+            onChanged: (double v) =>
+                setState(() => _desiredMarginPercent = v),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAF9),
+              borderRadius: BorderRadius.circular(10),
             ),
-            _InfoRow(
-              label: 'Status Database',
-              value: provider.isCloudDatabaseActive
-                  ? 'Terhubung ke Supabase PostgreSQL Cloud'
-                  : 'Mode Lokal Aktif (Isi URL & Key di supabase_config.dart)',
+            child: Wrap(
+              spacing: 24,
+              runSpacing: 10,
+              alignment: WrapAlignment.spaceBetween,
+              children: <Widget>[
+                _ResultBox(
+                  label: 'Modal / Pcs',
+                  value: CurrencyFormatter.formatRupiah(unitModal),
+                ),
+                _ResultBox(
+                  label: 'Saran Jual / Pcs',
+                  value: CurrencyFormatter.formatRupiah(roundedSellUnit),
+                  highlight: true,
+                ),
+                _ResultBox(
+                  label: 'Untung / Pcs',
+                  value: '+${CurrencyFormatter.formatRupiah(profitPerUnit)}',
+                ),
+                _ResultBox(
+                  label: 'Total Untung 1 Dus',
+                  value: '+${CurrencyFormatter.formatRupiah(profitPerPack)}',
+                  highlight: true,
+                ),
+              ],
             ),
-            const _InfoRow(
-              label: 'Jumlah Screen',
-              value: '7 Screen Fungsional (Home, Katalog, Detail, Stok, Tambah, Edit, Profil)',
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -312,20 +328,23 @@ class _InfoRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           SizedBox(
-            width: 128,
+            width: 110,
             child: Text(
               label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: const Color(0xFF9CA3AF),
+              ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF1A1D1A),
+              ),
             ),
           ),
         ],
@@ -350,13 +369,23 @@ class _ResultBox extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(label, style: Theme.of(context).textTheme.labelSmall),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 11,
+            color: const Color(0xFF9CA3AF),
+          ),
+        ),
+        const SizedBox(height: 2),
         Text(
           value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: highlight ? Colors.green.shade800 : null,
-              ),
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: highlight
+                ? const Color(0xFF059669)
+                : const Color(0xFF1A1D1A),
+          ),
         ),
       ],
     );

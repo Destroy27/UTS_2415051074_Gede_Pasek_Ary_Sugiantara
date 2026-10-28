@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../core/breakpoint.dart';
@@ -12,9 +13,7 @@ import '../widgets/state_views.dart';
 import 'add_inventory_screen.dart';
 import 'edit_inventory_screen.dart';
 
-/// Screen #6 (Saved / Inventory List): Menampilkan & mengelola data stok barang
-/// dagangan dari Database Supabase (Read, Quick Update, Navigate to Edit, Delete
-/// dengan Confirmation Dialog).
+/// Screen #6: Daftar Stok Lapak & Catatan Kulakan.
 class InventoryListScreen extends StatefulWidget {
   const InventoryListScreen({super.key});
 
@@ -42,27 +41,40 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          icon: Icon(
-            Icons.warning_amber_rounded,
-            color: Theme.of(dialogContext).colorScheme.error,
-            size: 36,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          title: const Text('Konfirmasi Hapus Barang'),
+          title: Text(
+            'Hapus Barang?',
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+          ),
           content: Text(
             'Apakah Anda yakin ingin menghapus "${item.productTitle}" (Stok: ${item.stockQty} unit) dari database lapak?',
+            style: GoogleFonts.inter(fontSize: 13),
           ),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Batal'),
+              child: Text(
+                'Batal',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+              ),
             ),
-            FilledButton.icon(
+            FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(dialogContext).colorScheme.error,
+                backgroundColor: const Color(0xFFDC2626),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              icon: const Icon(Icons.delete_forever),
-              label: const Text('Ya, Hapus'),
+              child: Text(
+                'Hapus',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+              ),
             ),
           ],
         );
@@ -77,7 +89,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Barang "${item.productTitle}" telah dihapus dari database.',
+            'Barang "${item.productTitle}" telah dihapus.',
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -86,8 +98,8 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Gagal menghapus data: $e'),
-          backgroundColor: Theme.of(context).colorScheme.error,
+          content: Text('Gagal menghapus: $e'),
+          backgroundColor: const Color(0xFFDC2626),
         ),
       );
     }
@@ -121,16 +133,18 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
         final int columns = gridColumnsFor(category);
 
         return Scaffold(
+          backgroundColor: const Color(0xFFF8FAF9),
           appBar: AppBar(
-            title: const Text('Stok Lapak & Catatan Kulakan'),
+            title: const Text('Stok Lapak'),
             actions: <Widget>[
               IconButton(
-                tooltip: 'Muat Ulang Database',
+                tooltip: 'Muat Ulang',
                 onPressed: () => provider.loadInventory(),
-                icon: const Icon(Icons.refresh),
+                icon: const Icon(Icons.refresh_rounded, size: 20),
+                color: const Color(0xFF6B7280),
               ),
               PopupMenuButton<String>(
-                tooltip: 'Opsi Pengujian State Database',
+                tooltip: 'Opsi',
                 onSelected: (String value) {
                   if (value == 'simulate_error') {
                     provider.loadInventory(simulateError: true);
@@ -138,23 +152,16 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                     provider.loadInventory();
                   }
                 },
+                icon: const Icon(Icons.more_vert_rounded, size: 20),
                 itemBuilder: (BuildContext context) =>
                     <PopupMenuEntry<String>>[
                   const PopupMenuItem<String>(
                     value: 'reload',
-                    child: ListTile(
-                      leading: Icon(Icons.sync),
-                      title: Text('Sinkronisasi Database'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
+                    child: Text('Sinkronisasi Database'),
                   ),
                   const PopupMenuItem<String>(
                     value: 'simulate_error',
-                    child: ListTile(
-                      leading: Icon(Icons.bug_report_outlined),
-                      title: Text('Simulasi Error Database'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
+                    child: Text('Simulasi Error Database'),
                   ),
                 ],
               ),
@@ -166,8 +173,19 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
           ),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => _openAddModalScreen(context),
-            icon: const Icon(Icons.add),
-            label: const Text('Barang Baru'),
+            backgroundColor: const Color(0xFF0B6E4F),
+            foregroundColor: Colors.white,
+            icon: const Icon(Icons.add, size: 20),
+            label: Text(
+              'Barang Baru',
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
           body: _buildBody(
             context: context,
@@ -190,13 +208,13 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
   }) {
     if (provider.isLoadingInventory) {
       return const LoadingStateView(
-        message: 'Memuat data inventaris barang pedagang dari database...',
+        message: 'Memuat data inventaris dari database...',
       );
     }
 
     if (provider.inventoryError != null) {
       return ErrorStateView(
-        title: 'Gagal Memuat Database Inventaris',
+        title: 'Gagal Memuat Database',
         message: provider.inventoryError!,
         onRetry: () => provider.loadInventory(),
       );
@@ -208,6 +226,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
     ];
 
     return RefreshIndicator(
+      color: const Color(0xFF0B6E4F),
       onRefresh: () => provider.loadInventory(),
       child: CustomScrollView(
         slivers: <Widget>[
@@ -219,35 +238,32 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                 children: <Widget>[
                   IdentityHeader(
                     subtitle: provider.isCloudDatabaseActive
-                        ? 'Database Aktif: Supabase PostgreSQL (Tabel merchant_inventory)'
-                        : 'Database Aktif: Mode Lokal Otomatis (Siap dihubungkan ke Supabase)',
+                        ? 'Database: Supabase PostgreSQL'
+                        : 'Mode Lokal (isi URL & Key untuk cloud)',
                     dense: true,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primaryContainer
-                          .withValues(alpha: 0.45),
-                      borderRadius: BorderRadius.circular(14),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFFE5E7EB),
+                      ),
                     ),
-                    child: Wrap(
-                      spacing: 18,
-                      runSpacing: 10,
-                      alignment: WrapAlignment.spaceBetween,
+                    child: Row(
                       children: <Widget>[
                         _SummaryItem(
-                          label: 'Jenis Barang',
+                          label: 'Jenis',
                           value: '${summary.totalSkuCount} SKU',
                         ),
                         _SummaryItem(
-                          label: 'Total Unit Stok',
-                          value: '${summary.totalUnitsInStock} Unit',
+                          label: 'Unit Stok',
+                          value: '${summary.totalUnitsInStock}',
                         ),
                         _SummaryItem(
-                          label: 'Total Modal',
+                          label: 'Modal',
                           value: CurrencyFormatter.formatCompactRupiah(
                             summary.totalCapitalIdr,
                           ),
@@ -266,22 +282,47 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                     controller: _searchController,
                     onChanged: provider.setInventorySearchQuery,
                     decoration: InputDecoration(
-                      hintText:
-                          'Cari nama barang, kategori, atau catatan agen...',
-                      prefixIcon: const Icon(Icons.search),
+                      hintText: 'Cari nama barang, kategori, catatan...',
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 20,
+                        color: Color(0xFF9CA3AF),
+                      ),
                       suffixIcon: provider.inventorySearchQuery.isNotEmpty
                           ? IconButton(
                               onPressed: () {
                                 _searchController.clear();
                                 provider.setInventorySearchQuery('');
                               },
-                              icon: const Icon(Icons.clear),
+                              icon: const Icon(Icons.clear_rounded, size: 18),
                             )
                           : null,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFE5E7EB),
+                        ),
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFE5E7EB),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF0B6E4F),
+                          width: 1.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
                       isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -298,6 +339,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                             selected: selected,
                             onSelected: (_) =>
                                 provider.setSelectedStockStatus(status),
+                            visualDensity: VisualDensity.compact,
                           ),
                         );
                       }).toList(),
@@ -311,9 +353,9 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
             SliverFillRemaining(
               hasScrollBody: false,
               child: EmptyStateView(
-                title: 'Belum Ada Data Barang yang Cocok',
+                title: 'Belum Ada Data Barang',
                 subtitle:
-                    'Tidak ditemukan stok barang untuk filter ini. Tambahkan stok baru atau reset pencarian Anda.',
+                    'Tidak ditemukan stok barang. Tambahkan stok baru atau reset pencarian.',
                 icon: Icons.inventory_2_outlined,
                 actionLabel: 'Reset Filter',
                 onAction: () {
@@ -351,7 +393,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                   crossAxisCount: columns,
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
-                  mainAxisExtent: 256,
+                  mainAxisExtent: 248,
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
@@ -384,18 +426,29 @@ class _SummaryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Text(label, style: Theme.of(context).textTheme.labelSmall),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-      ],
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              color: const Color(0xFF9CA3AF),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF1A1D1A),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

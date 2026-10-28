@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'identity_header.dart';
 
 /// Reusable Widget #4: Komponen tampilan Loading, Error, dan Empty State.
-///
-/// Memenuhi spesifikasi minimum REST API, Database, & Error Handling pada UTS:
-/// - Menampilkan indikator loading saat proses async berlangsung
-/// - Menampilkan pesan error yang informatif beserta tombol "Coba Lagi" (Retry)
-/// - Menampilkan tampilan Empty State saat data kosong atau hasil pencarian nihil.
 class LoadingStateView extends StatelessWidget {
   const LoadingStateView({
     super.key,
@@ -24,14 +20,24 @@ class LoadingStateView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const CircularProgressIndicator(),
+            SizedBox(
+              width: 36,
+              height: 36,
+              child: CircularProgressIndicator(
+                strokeWidth: 3,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
             const SizedBox(height: 16),
             Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: const Color(0xFF6B7280),
+              ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
               child: const IdentityHeader(dense: true),
@@ -57,58 +63,68 @@ class ErrorStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colors = Theme.of(context).colorScheme;
-
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: Card(
-            elevation: 0,
-            color: colors.errorContainer.withValues(alpha: 0.35),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: colors.error.withValues(alpha: 0.4)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(
-                    Icons.cloud_off_rounded,
-                    size: 48,
-                    color: colors.error,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colors.onSurface,
-                        ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    message,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  const IdentityHeader(dense: true),
-                  const SizedBox(height: 16),
-                  FilledButton.icon(
-                    onPressed: onRetry,
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Coba Lagi'),
-                  ),
-                ],
+          constraints: const BoxConstraints(maxWidth: 440),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEE2E2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  Icons.wifi_off_rounded,
+                  size: 28,
+                  color: Color(0xFFDC2626),
+                ),
               ),
-            ),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1A1D1A),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: const Color(0xFF6B7280),
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              const IdentityHeader(dense: true),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                onPressed: onRetry,
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF0B6E4F),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                icon: const Icon(Icons.refresh, size: 18),
+                label: Text(
+                  'Coba Lagi',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -134,46 +150,63 @@ class EmptyStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colors = Theme.of(context).colorScheme;
-
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 440),
+          constraints: const BoxConstraints(maxWidth: 380),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(
-                padding: const EdgeInsets.all(18),
+                width: 64,
+                height: 64,
                 decoration: BoxDecoration(
-                  color: colors.surfaceContainerHighest,
-                  shape: BoxShape.circle,
+                  color: const Color(0xFFF3F4F6),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: Icon(icon, size: 42, color: colors.primary),
+                child: Icon(
+                  icon,
+                  size: 30,
+                  color: const Color(0xFF9CA3AF),
+                ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               Text(
                 title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1A1D1A),
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 6),
               Text(
                 subtitle,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: const Color(0xFF6B7280),
+                  height: 1.5,
+                ),
                 textAlign: TextAlign.center,
               ),
               if (actionLabel != null && onAction != null) ...<Widget>[
                 const SizedBox(height: 16),
-                FilledButton.tonalIcon(
+                OutlinedButton(
                   onPressed: onAction,
-                  icon: const Icon(Icons.restart_alt),
-                  label: Text(actionLabel!),
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    actionLabel!,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ],
             ],

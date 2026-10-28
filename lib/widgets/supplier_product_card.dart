@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../core/currency_formatter.dart';
 import '../models/supplier_product.dart';
@@ -24,20 +25,14 @@ class SupplierProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme colors = theme.colorScheme;
+    final ColorScheme colors = Theme.of(context).colorScheme;
 
     return Card(
-      elevation: 0,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.7)),
-      ),
       child: InkWell(
         onTap: onTapDetail,
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -45,8 +40,8 @@ class SupplierProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                    width: 64,
-                    height: 64,
+                    width: 56,
+                    height: 56,
                     decoration: BoxDecoration(
                       color: colors.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(12),
@@ -57,18 +52,18 @@ class SupplierProductCard extends StatelessWidget {
                             product.thumbnail,
                             fit: BoxFit.cover,
                             errorBuilder: (_, _, _) => Icon(
-                              Icons.local_shipping_outlined,
+                              Icons.inventory_2_outlined,
                               color: colors.primary,
-                              size: 28,
+                              size: 24,
                             ),
                           )
                         : Icon(
-                            Icons.local_shipping_outlined,
+                            Icons.inventory_2_outlined,
                             color: colors.primary,
-                            size: 28,
+                            size: 24,
                           ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,18 +72,19 @@ class SupplierProductCard extends StatelessWidget {
                           children: <Widget>[
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 7,
-                                vertical: 2,
+                                horizontal: 8,
+                                vertical: 3,
                               ),
                               decoration: BoxDecoration(
-                                color: colors.secondaryContainer,
+                                color: colors.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 product.categoryLabel,
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: colors.onSecondaryContainer,
-                                  fontWeight: FontWeight.w600,
+                                style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFF4B5563),
                                 ),
                               ),
                             ),
@@ -97,17 +93,18 @@ class SupplierProductCard extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 6,
-                                  vertical: 2,
+                                  vertical: 3,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.orange.shade100,
+                                  color: Colors.orange.shade50,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  'Hemat ${product.discountPercentage.toStringAsFixed(0)}%',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: Colors.orange.shade900,
-                                    fontWeight: FontWeight.bold,
+                                  '-${product.discountPercentage.toStringAsFixed(0)}%',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.orange.shade700,
                                   ),
                                 ),
                               ),
@@ -116,17 +113,21 @@ class SupplierProductCard extends StatelessWidget {
                         const SizedBox(height: 6),
                         Text(
                           product.title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF1A1D1A),
+                            height: 1.3,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${product.brand} • Stok Agen: ${product.stock} unit',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colors.onSurfaceVariant,
+                          '${product.brand} • ${product.stock} unit',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: const Color(0xFF9CA3AF),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -136,25 +137,20 @@ class SupplierProductCard extends StatelessWidget {
                   ),
                   IconButton(
                     visualDensity: VisualDensity.compact,
-                    tooltip: isBookmarked
-                        ? 'Hapus dari pantauan harga'
-                        : 'Simpan ke pantauan harga (Shared State)',
                     onPressed: onToggleBookmark,
                     icon: Icon(
-                      isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                      color: isBookmarked ? colors.primary : null,
+                      isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                      size: 20,
+                      color: isBookmarked ? colors.primary : const Color(0xFF9CA3AF),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: colors.surfaceContainerLow,
+                  color: const Color(0xFFF8FAF9),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -164,17 +160,18 @@ class SupplierProductCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            'Harga Modal Grosir',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colors.onSurfaceVariant,
+                            'Harga Modal',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: const Color(0xFF9CA3AF),
                             ),
                           ),
+                          const SizedBox(height: 2),
                           Text(
-                            CurrencyFormatter.formatRupiah(
-                              product.wholesalePriceIdr,
-                            ),
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
+                            CurrencyFormatter.formatRupiah(product.wholesalePriceIdr),
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
                               color: colors.primary,
                             ),
                           ),
@@ -186,60 +183,130 @@ class SupplierProductCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            'Saran Jual (+Laba)',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colors.onSurfaceVariant,
+                            'Saran Jual',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: const Color(0xFF9CA3AF),
                             ),
                           ),
+                          const SizedBox(height: 2),
                           Text(
-                            '${CurrencyFormatter.formatRupiah(product.suggestedRetailPriceIdr)} (+${CurrencyFormatter.formatRupiah(product.estimatedProfitPerUnit, withPrefix: false)})',
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green.shade700,
+                            CurrencyFormatter.formatRupiah(product.suggestedRetailPriceIdr),
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF059669),
                             ),
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Text(
+                          'Laba/Unit',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: const Color(0xFF9CA3AF),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '+${CurrencyFormatter.formatRupiah(product.estimatedProfitPerUnit)}',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF059669),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               Row(
                 children: <Widget>[
-                  Icon(Icons.star, size: 16, color: Colors.amber.shade700),
-                  const SizedBox(width: 4),
+                  Icon(Icons.star_rounded, size: 14, color: Colors.amber.shade600),
+                  const SizedBox(width: 3),
                   Text(
                     product.rating.toStringAsFixed(1),
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF4B5563),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 12),
                   if (isInInventory)
-                    Chip(
-                      visualDensity: VisualDensity.compact,
-                      avatar: Icon(
-                        Icons.check_circle,
-                        size: 15,
-                        color: Colors.green.shade700,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
                       ),
-                      label: const Text(
-                        'Ada di Lapak',
-                        style: TextStyle(fontSize: 11),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Icon(
+                            Icons.check_circle_rounded,
+                            size: 13,
+                            color: Colors.green.shade600,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            'Di Lapak',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.green.shade700,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   const Spacer(),
                   TextButton(
                     onPressed: onTapDetail,
-                    child: const Text('Detail'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFF6B7280),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      minimumSize: const Size(0, 36),
+                    ),
+                    child: Text(
+                      'Detail',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 4),
                   FilledButton.tonalIcon(
                     onPressed: onQuickAddInventory,
-                    icon: const Icon(Icons.add_shopping_cart, size: 16),
-                    label: const Text('Kulakan'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: colors.primary.withValues(alpha: 0.08),
+                      foregroundColor: colors.primary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    icon: const Icon(Icons.add, size: 16),
+                    label: Text(
+                      'Kulakan',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ],
               ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../config/api_config.dart';
 import '../core/breakpoint.dart';
 import '../models/merchant_item.dart';
 import '../models/supplier_product.dart';
@@ -12,9 +12,7 @@ import '../widgets/supplier_product_card.dart';
 import 'add_inventory_screen.dart';
 import 'catalog_detail_screen.dart';
 
-/// Screen #2 (List / Catalog): Menampilkan katalog produk grosir dari REST API
-/// (`GET https://dummyjson.com/products?limit=30`) dengan pencarian, filter
-/// kategori, filter bookmark pantauan harga, pengurutan, dan layout responsif.
+/// Screen #2 (List / Catalog): Menampilkan katalog produk grosir dari REST API.
 class CatalogListScreen extends StatefulWidget {
   const CatalogListScreen({super.key});
 
@@ -79,16 +77,18 @@ class _CatalogListScreenState extends State<CatalogListScreen> {
         final int columns = gridColumnsFor(category);
 
         return Scaffold(
+          backgroundColor: const Color(0xFFF8FAF9),
           appBar: AppBar(
-            title: const Text('Katalog Grosir Supplier (REST API)'),
+            title: const Text('Katalog Grosir'),
             actions: <Widget>[
               IconButton(
-                tooltip: 'Muat Ulang REST API',
+                tooltip: 'Muat Ulang',
                 onPressed: () => provider.loadCatalog(),
-                icon: const Icon(Icons.refresh),
+                icon: const Icon(Icons.refresh_rounded, size: 20),
+                color: const Color(0xFF6B7280),
               ),
               PopupMenuButton<String>(
-                tooltip: 'Opsi Pengujian REST API',
+                tooltip: 'Opsi Pengujian',
                 onSelected: (String value) {
                   if (value == 'simulate_error') {
                     provider.loadCatalog(simulateError: true);
@@ -96,23 +96,16 @@ class _CatalogListScreenState extends State<CatalogListScreen> {
                     provider.loadCatalog();
                   }
                 },
+                icon: const Icon(Icons.more_vert_rounded, size: 20),
                 itemBuilder: (BuildContext context) =>
                     <PopupMenuEntry<String>>[
                   const PopupMenuItem<String>(
                     value: 'reload',
-                    child: ListTile(
-                      leading: Icon(Icons.cloud_download_outlined),
-                      title: Text('GET Data Baru dari API'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
+                    child: Text('GET Data Baru'),
                   ),
                   const PopupMenuItem<String>(
                     value: 'simulate_error',
-                    child: ListTile(
-                      leading: Icon(Icons.wifi_off_outlined),
-                      title: Text('Simulasi Error Jaringan API'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
+                    child: Text('Simulasi Error Jaringan'),
                   ),
                 ],
               ),
@@ -143,20 +136,20 @@ class _CatalogListScreenState extends State<CatalogListScreen> {
   }) {
     if (provider.isLoadingCatalog) {
       return const LoadingStateView(
-        message:
-            'Mengambil katalog produk grosir dari REST API (${ApiConfig.productsEndpoint})...',
+        message: 'Mengambil katalog produk grosir dari REST API...',
       );
     }
 
     if (provider.catalogError != null) {
       return ErrorStateView(
-        title: 'Gagal Memuat Katalog REST API',
+        title: 'Gagal Memuat Katalog',
         message: provider.catalogError!,
         onRetry: () => provider.loadCatalog(),
       );
     }
 
     return RefreshIndicator(
+      color: const Color(0xFF0B6E4F),
       onRefresh: () => provider.loadCatalog(),
       child: CustomScrollView(
         slivers: <Widget>[
@@ -168,48 +161,118 @@ class _CatalogListScreenState extends State<CatalogListScreen> {
                 children: <Widget>[
                   const IdentityHeader(
                     subtitle:
-                        'Sumber Data: GET https://dummyjson.com/products • Pilih barang untuk kulakan',
+                        'Sumber Data: GET dummyjson.com/products • Pilih barang untuk kulakan',
                     dense: true,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: _searchController,
+                    onChanged: provider.setCatalogSearchQuery,
+                    decoration: InputDecoration(
+                      hintText: 'Cari barang grosir atau brand...',
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 20,
+                        color: Color(0xFF9CA3AF),
+                      ),
+                      suffixIcon: provider.catalogSearchQuery.isNotEmpty
+                          ? IconButton(
+                              onPressed: () {
+                                _searchController.clear();
+                                provider.setCatalogSearchQuery('');
+                              },
+                              icon: const Icon(Icons.clear_rounded, size: 18),
+                            )
+                          : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFE5E7EB),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFE5E7EB),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF0B6E4F),
+                          width: 1.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   Row(
                     children: <Widget>[
                       Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: provider.setCatalogSearchQuery,
-                          decoration: InputDecoration(
-                            hintText: 'Cari barang grosir atau brand...',
-                            prefixIcon: const Icon(Icons.search),
-                            suffixIcon: provider.catalogSearchQuery.isNotEmpty
-                                ? IconButton(
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      provider.setCatalogSearchQuery('');
-                                    },
-                                    icon: const Icon(Icons.clear),
-                                  )
-                                : null,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            isDense: true,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: <Widget>[
+                              FilterChip(
+                                avatar: Icon(
+                                  provider.onlyBookmarkedCatalog
+                                      ? Icons.bookmark_rounded
+                                      : Icons.bookmark_border_rounded,
+                                  size: 16,
+                                ),
+                                label: Text(
+                                  'Pantauan (${provider.bookmarkCount})',
+                                ),
+                                selected: provider.onlyBookmarkedCatalog,
+                                onSelected: provider.setOnlyBookmarkedCatalog,
+                                visualDensity: VisualDensity.compact,
+                              ),
+                              const SizedBox(width: 8),
+                              ...categories.map((String cat) {
+                                final bool selected =
+                                    provider.selectedCatalogCategory == cat;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: ChoiceChip(
+                                    label: Text(cat),
+                                    selected: selected,
+                                    onSelected: (_) =>
+                                        provider.setSelectedCatalogCategory(cat),
+                                    visualDensity: VisualDensity.compact,
+                                  ),
+                                );
+                              }),
+                            ],
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       PopupMenuButton<CatalogSortOption>(
-                        tooltip: 'Urutkan Katalog',
+                        tooltip: 'Urutkan',
                         initialValue: provider.sortOption,
                         onSelected: provider.setSortOption,
-                        icon: const Icon(Icons.sort),
+                        icon: const Icon(
+                          Icons.sort_rounded,
+                          size: 20,
+                          color: Color(0xFF6B7280),
+                        ),
                         itemBuilder: (BuildContext context) {
                           return CatalogSortOption.values
                               .map(
                                 (CatalogSortOption opt) =>
                                     PopupMenuItem<CatalogSortOption>(
                                   value: opt,
-                                  child: Text(opt.label),
+                                  child: Text(
+                                    opt.label,
+                                    style: GoogleFonts.inter(fontSize: 13),
+                                  ),
                                 ),
                               )
                               .toList();
@@ -217,54 +280,13 @@ class _CatalogListScreenState extends State<CatalogListScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: <Widget>[
-                        FilterChip(
-                          avatar: Icon(
-                            provider.onlyBookmarkedCatalog
-                                ? Icons.bookmark
-                                : Icons.bookmark_border,
-                            size: 16,
-                          ),
-                          label: Text(
-                            'Pantauan (${provider.bookmarkCount})',
-                          ),
-                          selected: provider.onlyBookmarkedCatalog,
-                          onSelected: provider.setOnlyBookmarkedCatalog,
-                        ),
-                        const SizedBox(width: 8),
-                        ...categories.map((String cat) {
-                          final bool selected =
-                              provider.selectedCatalogCategory == cat;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: ChoiceChip(
-                              label: Text(cat),
-                              selected: selected,
-                              onSelected: (_) =>
-                                  provider.setSelectedCatalogCategory(cat),
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
-                  ),
                   const SizedBox(height: 6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(
-                        'Menampilkan ${products.length} produk grosir',
-                        style: Theme.of(context).textTheme.labelMedium,
-                      ),
-                      Text(
-                        'Urutan: ${provider.sortOption.label}',
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                    ],
+                  Text(
+                    '${products.length} produk grosir • ${provider.sortOption.label}',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: const Color(0xFF9CA3AF),
+                    ),
                   ),
                 ],
               ),
@@ -274,11 +296,11 @@ class _CatalogListScreenState extends State<CatalogListScreen> {
             SliverFillRemaining(
               hasScrollBody: false,
               child: EmptyStateView(
-                title: 'Produk Grosir Tidak Ditemukan',
+                title: 'Produk Tidak Ditemukan',
                 subtitle:
-                    'Tidak ada produk supplier yang cocok dengan kata kunci atau filter yang dipilih.',
+                    'Tidak ada produk supplier yang cocok dengan filter yang dipilih.',
                 icon: Icons.search_off_rounded,
-                actionLabel: 'Reset Filter Katalog',
+                actionLabel: 'Reset Filter',
                 onAction: () {
                   _searchController.clear();
                   provider.resetCatalogFilters();
@@ -315,7 +337,7 @@ class _CatalogListScreenState extends State<CatalogListScreen> {
                   crossAxisCount: columns,
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
-                  mainAxisExtent: 232,
+                  mainAxisExtent: 220,
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {

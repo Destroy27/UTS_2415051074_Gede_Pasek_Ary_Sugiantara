@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../core/currency_formatter.dart';
 import '../models/merchant_item.dart';
 
 /// Reusable Widget #5: Kartu Barang Stok Lapak Pedagang (Database Item).
-///
-/// Menampilkan status stok, harga modal vs harga jual, margin keuntungan,
-/// catatan pedagang, serta aksi cepat (+1/-1 stok, Edit, dan Delete).
 class MerchantItemCard extends StatelessWidget {
   const MerchantItemCard({
     super.key,
@@ -23,39 +21,29 @@ class MerchantItemCard extends StatelessWidget {
   final VoidCallback onIncrementStock;
   final VoidCallback onDecrementStock;
 
-  Color _statusColor(String status, ColorScheme colors) {
+  Color _statusColor(String status) {
     switch (status) {
       case 'Stok Aman':
-        return Colors.green.shade700;
+        return const Color(0xFF059669);
       case 'Perlu Kulakan':
-        return Colors.orange.shade800;
+        return Colors.orange.shade700;
       case 'Habis':
-        return colors.error;
+        return const Color(0xFFDC2626);
       case 'Rencana Beli':
-        return colors.tertiary;
+        return const Color(0xFF2563EB);
       default:
-        return colors.primary;
+        return const Color(0xFF6B7280);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme colors = theme.colorScheme;
-    final Color badgeColor = _statusColor(item.restockStatus, colors);
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    final Color badgeColor = _statusColor(item.restockStatus);
 
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(
-          color: item.needsAttention
-              ? badgeColor.withValues(alpha: 0.5)
-              : colors.outlineVariant.withValues(alpha: 0.7),
-        ),
-      ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -63,8 +51,8 @@ class MerchantItemCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
                     color: colors.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(10),
@@ -77,11 +65,13 @@ class MerchantItemCard extends StatelessWidget {
                           errorBuilder: (_, _, _) => Icon(
                             Icons.inventory_2_outlined,
                             color: colors.primary,
+                            size: 20,
                           ),
                         )
                       : Icon(
                           Icons.inventory_2_outlined,
                           color: colors.primary,
+                          size: 20,
                         ),
                 ),
                 const SizedBox(width: 12),
@@ -94,56 +84,57 @@ class MerchantItemCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               item.productTitle,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF1A1D1A),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: badgeColor.withValues(alpha: 0.14),
-                              borderRadius: BorderRadius.circular(20),
+                              color: badgeColor.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               item.restockStatus,
-                              style: theme.textTheme.labelSmall?.copyWith(
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
                                 color: badgeColor,
-                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 4,
-                        crossAxisAlignment: WrapCrossAlignment.center,
+                      Row(
                         children: <Widget>[
                           Text(
                             item.category,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colors.onSurfaceVariant,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: const Color(0xFF9CA3AF),
                             ),
                           ),
-                          const Text('•'),
+                          const SizedBox(width: 8),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: List<Widget>.generate(
                               5,
                               (int i) => Icon(
                                 i < item.rating
-                                    ? Icons.star
-                                    : Icons.star_border,
-                                size: 14,
-                                color: Colors.amber.shade700,
+                                    ? Icons.star_rounded
+                                    : Icons.star_outline_rounded,
+                                size: 12,
+                                color: Colors.amber.shade600,
                               ),
                             ),
                           ),
@@ -158,30 +149,29 @@ class MerchantItemCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: colors.surfaceContainerLow,
+                color: const Color(0xFFF8FAF9),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
                 children: <Widget>[
                   Expanded(
                     child: _PriceMetric(
-                      label: 'Modal Beli',
+                      label: 'Modal',
                       value: CurrencyFormatter.formatRupiah(item.buyPrice),
                     ),
                   ),
                   Expanded(
                     child: _PriceMetric(
-                      label: 'Harga Jual',
+                      label: 'Jual',
                       value: CurrencyFormatter.formatRupiah(item.sellPrice),
                       valueColor: colors.primary,
                     ),
                   ),
                   Expanded(
                     child: _PriceMetric(
-                      label: 'Laba/Unit (${item.marginPercentage.toStringAsFixed(0)}%)',
-                      value:
-                          '+${CurrencyFormatter.formatRupiah(item.profitPerUnit)}',
-                      valueColor: Colors.green.shade700,
+                      label: 'Laba/Unit',
+                      value: '+${CurrencyFormatter.formatRupiah(item.profitPerUnit)}',
+                      valueColor: const Color(0xFF059669),
                     ),
                   ),
                 ],
@@ -194,15 +184,16 @@ class MerchantItemCard extends StatelessWidget {
                 children: <Widget>[
                   Icon(
                     Icons.sticky_note_2_outlined,
-                    size: 16,
-                    color: colors.onSurfaceVariant,
+                    size: 14,
+                    color: const Color(0xFF9CA3AF),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       item.merchantNote,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: const Color(0xFF6B7280),
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -211,12 +202,14 @@ class MerchantItemCard extends StatelessWidget {
                 ],
               ),
             ],
-            const Divider(height: 20),
+            const SizedBox(height: 12),
             Row(
               children: <Widget>[
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: colors.outlineVariant),
+                    border: Border.all(
+                      color: const Color(0xFFE5E7EB),
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -227,13 +220,16 @@ class MerchantItemCard extends StatelessWidget {
                         tooltip: 'Kurangi 1 stok',
                         onPressed: item.stockQty > 0 ? onDecrementStock : null,
                         icon: const Icon(Icons.remove, size: 16),
+                        color: const Color(0xFF6B7280),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Text(
-                          'Stok: ${item.stockQty}',
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
+                          '${item.stockQty}',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF1A1D1A),
                           ),
                         ),
                       ),
@@ -242,6 +238,7 @@ class MerchantItemCard extends StatelessWidget {
                         tooltip: 'Tambah 1 stok',
                         onPressed: onIncrementStock,
                         icon: const Icon(Icons.add, size: 16),
+                        color: colors.primary,
                       ),
                     ],
                   ),
@@ -249,15 +246,25 @@ class MerchantItemCard extends StatelessWidget {
                 const Spacer(),
                 TextButton.icon(
                   onPressed: onEdit,
-                  icon: const Icon(Icons.edit_outlined, size: 18),
-                  label: const Text('Edit'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF6B7280),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: const Size(0, 36),
+                  ),
+                  icon: const Icon(Icons.edit_outlined, size: 16),
+                  label: Text(
+                    'Edit',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 4),
                 IconButton(
                   tooltip: 'Hapus dari database',
                   onPressed: onDelete,
-                  color: colors.error,
-                  icon: const Icon(Icons.delete_outline),
+                  color: const Color(0xFFDC2626),
+                  icon: const Icon(Icons.delete_outline, size: 20),
                 ),
               ],
             ),
@@ -286,18 +293,20 @@ class _PriceMetric extends StatelessWidget {
       children: <Widget>[
         Text(
           label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+          style: GoogleFonts.inter(
+            fontSize: 11,
+            color: const Color(0xFF9CA3AF),
+          ),
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 2),
         Text(
           value,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: valueColor,
-              ),
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: valueColor ?? const Color(0xFF1A1D1A),
+          ),
           overflow: TextOverflow.ellipsis,
         ),
       ],

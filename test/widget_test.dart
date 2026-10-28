@@ -85,7 +85,7 @@ void main() {
     expect(find.text('Gede Pasek Ary Sugiantara'), findsWidgets);
     expect(find.textContaining('2415051074'), findsWidgets);
     expect(find.text('Beranda'), findsWidgets);
-    expect(find.text('Katalog API'), findsWidgets);
-    expect(find.text('Stok Lapak'), findsWidgets);
+    expect(find.text('Katalog'), findsWidgets);
+    expect(find.text('Stok'), findsWidgets);
   });
 }

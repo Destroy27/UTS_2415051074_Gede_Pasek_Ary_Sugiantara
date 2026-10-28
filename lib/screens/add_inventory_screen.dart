@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../core/breakpoint.dart';
@@ -9,12 +10,7 @@ import '../models/supplier_product.dart';
 import '../providers/merchant_provider.dart';
 import '../widgets/identity_header.dart';
 
-/// Screen #4 (Create/Add): Form Tambah Barang Dagangan & Catatan Kulakan ke Database.
-///
-/// Dapat dibuka melalui:
-/// - Tab navigasi utama "Tambah Stok"
-/// - Tombol "Masuk ke Stok Lapak" pada Detail Katalog Produk Supplier (passing data)
-/// - FloatingActionButton pada halaman Stok Lapak.
+/// Screen #4 (Create/Add): Form Tambah Barang Dagangan & Catatan Kulakan.
 class AddInventoryScreen extends StatefulWidget {
   const AddInventoryScreen({
     super.key,
@@ -134,9 +130,7 @@ class _AddInventoryScreenState extends State<AddInventoryScreen> {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Mohon periksa kembali input form yang belum valid.',
-          ),
+          content: Text('Mohon periksa kembali input form yang belum valid.'),
         ),
       );
       return;
@@ -186,8 +180,8 @@ class _AddInventoryScreenState extends State<AddInventoryScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Gagal menyimpan data ke database: $e'),
-          backgroundColor: Theme.of(context).colorScheme.error,
+          content: Text('Gagal menyimpan data: $e'),
+          backgroundColor: const Color(0xFFDC2626),
         ),
       );
     }
@@ -209,8 +203,9 @@ class _AddInventoryScreenState extends State<AddInventoryScreen> {
         final bool isWide = category != LayoutCategory.compact;
 
         return Scaffold(
+          backgroundColor: const Color(0xFFF8FAF9),
           appBar: AppBar(
-            title: const Text('Tambah Stok & Kulakan Lapak'),
+            title: const Text('Tambah Stok'),
             actions: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(right: 12),
@@ -219,350 +214,316 @@ class _AddInventoryScreenState extends State<AddInventoryScreen> {
             ],
           ),
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 960),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const IdentityHeader(
-                      subtitle:
-                          'Form CREATE Database: Catat stok barang baru & kalkulasi margin keuntungan',
-                      dense: true,
-                    ),
-                    const SizedBox(height: 14),
-                    if (_linkedProductId > 0)
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 14),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .secondaryContainer
-                              .withValues(alpha: 0.7),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: <Widget>[
-                            const Icon(Icons.auto_awesome, size: 20),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                'Data produk diambil dari Katalog REST API (ID #$_linkedProductId). Anda bebas menyesuaikan harga jual & stok warung.',
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: _resetForm,
-                              child: const Text('Input Manual'),
-                            ),
-                          ],
-                        ),
+                constraints: const BoxConstraints(maxWidth: 900),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const IdentityHeader(
+                        subtitle:
+                            'Form Create Database: Catat stok barang & kalkulasi margin',
+                        dense: true,
                       ),
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Card(
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              side: BorderSide(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .outlineVariant,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    '1. Informasi Barang Dagangan',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  TextFormField(
-                                    controller: _titleController,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Nama Barang Dagangan *',
-                                      hintText:
-                                          'Contoh: Beras Ramos 5Kg / Minyak Goreng 1L',
-                                      prefixIcon:
-                                          Icon(Icons.shopping_bag_outlined),
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    validator: (String? value) {
-                                      if (value == null ||
-                                          value.trim().isEmpty) {
-                                        return 'Nama barang wajib diisi';
-                                      }
-                                      if (value.trim().length < 3) {
-                                        return 'Nama barang minimal 3 karakter';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 14),
-                                  if (isWide)
-                                    Row(
-                                      children: <Widget>[
-                                        Expanded(child: _buildCategoryField()),
-                                        const SizedBox(width: 12),
-                                        Expanded(child: _buildStatusField()),
-                                      ],
-                                    )
-                                  else ...<Widget>[
-                                    _buildCategoryField(),
-                                    const SizedBox(height: 14),
-                                    _buildStatusField(),
-                                  ],
-                                ],
-                              ),
+                      const SizedBox(height: 14),
+                      if (_linkedProductId > 0)
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 14),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFECFDF5),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color(0xFF0B6E4F).withValues(alpha: 0.2),
                             ),
                           ),
-                          const SizedBox(height: 14),
-                          Card(
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              side: BorderSide(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .outlineVariant,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    '2. Harga Modal, Harga Jual & Jumlah Stok',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  if (isWide)
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Expanded(child: _buildBuyPriceField()),
-                                        const SizedBox(width: 12),
-                                        Expanded(child: _buildSellPriceField()),
-                                        const SizedBox(width: 12),
-                                        Expanded(child: _buildStockQtyField()),
-                                      ],
-                                    )
-                                  else ...<Widget>[
-                                    _buildBuyPriceField(),
-                                    const SizedBox(height: 14),
-                                    _buildSellPriceField(),
-                                    const SizedBox(height: 14),
-                                    _buildStockQtyField(),
-                                  ],
-                                  const SizedBox(height: 10),
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        'Bantu Hitung Harga Jual:',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelMedium,
-                                      ),
-                                      ActionChip(
-                                        label: const Text('+15% Laba'),
-                                        onPressed: () => _applyQuickMargin(15),
-                                      ),
-                                      ActionChip(
-                                        label: const Text('+25% Laba'),
-                                        onPressed: () => _applyQuickMargin(25),
-                                      ),
-                                      ActionChip(
-                                        label: const Text('+35% Laba'),
-                                        onPressed: () => _applyQuickMargin(35),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          Card(
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              side: BorderSide(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .outlineVariant,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    '3. Rating Perputaran Barang & Catatan Pedagang',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: <Widget>[
-                                      const Text('Tingkat Laris (1-5): '),
-                                      const SizedBox(width: 8),
-                                      ...List<Widget>.generate(5, (int idx) {
-                                        final int star = idx + 1;
-                                        return IconButton(
-                                          visualDensity: VisualDensity.compact,
-                                          onPressed: () {
-                                            setState(() {
-                                              _selectedRating = star;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            star <= _selectedRating
-                                                ? Icons.star
-                                                : Icons.star_border,
-                                            color: Colors.amber.shade700,
-                                          ),
-                                        );
-                                      }),
-                                      Text(
-                                        '($_selectedRating/5)',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  TextFormField(
-                                    controller: _noteController,
-                                    maxLines: 3,
-                                    decoration: const InputDecoration(
-                                      labelText:
-                                          'Catatan Pedagang / Nama Agen Grosir *',
-                                      hintText:
-                                          'Contoh: Beli di Agen Makmur Pasar Anyar, diskon jika ambil 2 dus.',
-                                      prefixIcon: Icon(Icons.edit_note),
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    validator: (String? value) {
-                                      if (value == null ||
-                                          value.trim().isEmpty) {
-                                        return 'Catatan pedagang wajib diisi';
-                                      }
-                                      if (value.trim().length < 5) {
-                                        return 'Catatan minimal 5 karakter';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer
-                                  .withValues(alpha: 0.45),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withValues(alpha: 0.3),
-                              ),
-                            ),
-                            child: Wrap(
-                              spacing: 20,
-                              runSpacing: 10,
-                              alignment: WrapAlignment.spaceBetween,
-                              children: <Widget>[
-                                _buildCalcItem(
-                                  'Laba / Unit',
-                                  CurrencyFormatter.formatRupiah(
-                                    previewProfitPerUnit,
-                                  ),
-                                  isPositive: previewProfitPerUnit >= 0,
-                                ),
-                                _buildCalcItem(
-                                  'Total Modal Stok',
-                                  CurrencyFormatter.formatRupiah(
-                                    previewTotalCapital,
-                                  ),
-                                ),
-                                _buildCalcItem(
-                                  'Total Potensi Laba',
-                                  CurrencyFormatter.formatRupiah(
-                                    previewTotalProfit,
-                                  ),
-                                  isPositive: previewTotalProfit >= 0,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          Row(
+                          child: Row(
                             children: <Widget>[
-                              OutlinedButton.icon(
-                                onPressed:
-                                    provider.isSubmitting ? null : _resetForm,
-                                icon: const Icon(Icons.refresh),
-                                label: const Text('Reset'),
+                              const Icon(
+                                Icons.auto_awesome_rounded,
+                                size: 18,
+                                color: Color(0xFF0B6E4F),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 10),
                               Expanded(
-                                child: FilledButton.icon(
-                                  onPressed: provider.isSubmitting
-                                      ? null
-                                      : _submitForm,
-                                  icon: provider.isSubmitting
-                                      ? const SizedBox(
-                                          width: 18,
-                                          height: 18,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                          ),
-                                        )
-                                      : const Icon(Icons.save_outlined),
-                                  label: Text(
-                                    provider.isSubmitting
-                                        ? 'Menyimpan Data...'
-                                        : 'Simpan ke Stok Lapak (Database)',
+                                child: Text(
+                                  'Data produk dari Katalog REST API (ID #$_linkedProductId). Sesuaikan harga jual & stok warung.',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: const Color(0xFF059669),
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: _resetForm,
+                                style: TextButton.styleFrom(
+                                  foregroundColor: const Color(0xFF6B7280),
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(0, 30),
+                                ),
+                                child: Text(
+                                  'Input Manual',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
                             ],
                           ),
+                        ),
+                      _buildCard(
+                        title: 'Informasi Barang',
+                        child: Column(
+                          children: <Widget>[
+                            TextFormField(
+                              controller: _titleController,
+                              decoration: const InputDecoration(
+                                labelText: 'Nama Barang *',
+                                hintText: 'Contoh: Beras Ramos 5Kg',
+                                prefixIcon: Icon(Icons.shopping_bag_outlined, size: 20),
+                              ),
+                              validator: (String? value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Nama barang wajib diisi';
+                                }
+                                if (value.trim().length < 3) {
+                                  return 'Minimal 3 karakter';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 14),
+                            if (isWide)
+                              Row(
+                                children: <Widget>[
+                                  Expanded(child: _buildCategoryField()),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: _buildStatusField()),
+                                ],
+                              )
+                            else ...<Widget>[
+                              _buildCategoryField(),
+                              const SizedBox(height: 14),
+                              _buildStatusField(),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      _buildCard(
+                        title: 'Harga & Stok',
+                        child: Column(
+                          children: <Widget>[
+                            if (isWide)
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Expanded(child: _buildBuyPriceField()),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: _buildSellPriceField()),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: _buildStockQtyField()),
+                                ],
+                              )
+                            else ...<Widget>[
+                              _buildBuyPriceField(),
+                              const SizedBox(height: 14),
+                              _buildSellPriceField(),
+                              const SizedBox(height: 14),
+                              _buildStockQtyField(),
+                            ],
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  'Bantu Hitung:',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: const Color(0xFF6B7280),
+                                  ),
+                                ),
+                                _QuickMarginChip(
+                                  label: '+15%',
+                                  onPressed: () => _applyQuickMargin(15),
+                                ),
+                                _QuickMarginChip(
+                                  label: '+25%',
+                                  onPressed: () => _applyQuickMargin(25),
+                                ),
+                                _QuickMarginChip(
+                                  label: '+35%',
+                                  onPressed: () => _applyQuickMargin(35),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      _buildCard(
+                        title: 'Rating & Catatan',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Text(
+                                  'Tingkat Laris:',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    color: const Color(0xFF6B7280),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                ...List<Widget>.generate(5, (int idx) {
+                                  final int star = idx + 1;
+                                  return IconButton(
+                                    visualDensity: VisualDensity.compact,
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedRating = star;
+                                      });
+                                    },
+                                    icon: Icon(
+                                      star <= _selectedRating
+                                          ? Icons.star_rounded
+                                          : Icons.star_outline_rounded,
+                                      color: Colors.amber.shade600,
+                                      size: 22,
+                                    ),
+                                  );
+                                }),
+                                Text(
+                                  '($_selectedRating/5)',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF6B7280),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            TextFormField(
+                              controller: _noteController,
+                              maxLines: 3,
+                              decoration: const InputDecoration(
+                                labelText: 'Catatan Pedagang / Agen Supplier *',
+                                hintText:
+                                    'Contoh: Beli di Agen Makmur Pasar Anyar, diskon jika ambil 2 dus.',
+                                prefixIcon: Icon(Icons.edit_note_rounded, size: 20),
+                              ),
+                              validator: (String? value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Catatan wajib diisi';
+                                }
+                                if (value.trim().length < 5) {
+                                  return 'Minimal 5 karakter';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(0xFFE5E7EB),
+                          ),
+                        ),
+                        child: Wrap(
+                          spacing: 24,
+                          runSpacing: 10,
+                          alignment: WrapAlignment.spaceBetween,
+                          children: <Widget>[
+                            _CalcItem(
+                              label: 'Laba / Unit',
+                              value: CurrencyFormatter.formatRupiah(
+                                previewProfitPerUnit,
+                              ),
+                              isPositive: previewProfitPerUnit >= 0,
+                            ),
+                            _CalcItem(
+                              label: 'Total Modal',
+                              value: CurrencyFormatter.formatRupiah(
+                                previewTotalCapital,
+                              ),
+                            ),
+                            _CalcItem(
+                              label: 'Total Potensi Laba',
+                              value: CurrencyFormatter.formatRupiah(
+                                previewTotalProfit,
+                              ),
+                              isPositive: previewTotalProfit >= 0,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: <Widget>[
+                          OutlinedButton.icon(
+                            onPressed:
+                                provider.isSubmitting ? null : _resetForm,
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            icon: const Icon(Icons.refresh_rounded, size: 18),
+                            label: Text(
+                              'Reset',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: FilledButton.icon(
+                              onPressed: provider.isSubmitting
+                                  ? null
+                                  : _submitForm,
+                              style: FilledButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              icon: provider.isSubmitting
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Icon(Icons.save_outlined, size: 18),
+                              label: Text(
+                                provider.isSubmitting
+                                    ? 'Menyimpan...'
+                                    : 'Simpan ke Database',
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -572,19 +533,45 @@ class _AddInventoryScreenState extends State<AddInventoryScreen> {
     );
   }
 
+  Widget _buildCard({required String title, required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF1A1D1A),
+            ),
+          ),
+          const SizedBox(height: 14),
+          child,
+        ],
+      ),
+    );
+  }
+
   Widget _buildCategoryField() {
     return DropdownButtonFormField<String>(
       initialValue: _selectedCategory,
       decoration: const InputDecoration(
-        labelText: 'Kategori Barang',
-        prefixIcon: Icon(Icons.category_outlined),
-        border: OutlineInputBorder(),
+        labelText: 'Kategori',
+        prefixIcon: Icon(Icons.category_outlined, size: 20),
       ),
       items: MerchantItem.standardCategories
           .map(
             (String cat) => DropdownMenuItem<String>(
               value: cat,
-              child: Text(cat),
+              child: Text(cat, style: GoogleFonts.inter(fontSize: 13)),
             ),
           )
           .toList(),
@@ -600,15 +587,14 @@ class _AddInventoryScreenState extends State<AddInventoryScreen> {
     return DropdownButtonFormField<String>(
       initialValue: _selectedStatus,
       decoration: const InputDecoration(
-        labelText: 'Status Stok / Kulakan',
-        prefixIcon: Icon(Icons.inventory_outlined),
-        border: OutlineInputBorder(),
+        labelText: 'Status Stok',
+        prefixIcon: Icon(Icons.inventory_outlined, size: 20),
       ),
       items: MerchantItem.validStatuses
           .map(
             (String status) => DropdownMenuItem<String>(
               value: status,
-              child: Text(status),
+              child: Text(status, style: GoogleFonts.inter(fontSize: 13)),
             ),
           )
           .toList(),
@@ -627,9 +613,8 @@ class _AddInventoryScreenState extends State<AddInventoryScreen> {
       onChanged: (_) => setState(() {}),
       decoration: const InputDecoration(
         labelText: 'Harga Beli / Modal (Rp) *',
-        hintText: 'Contoh: 15000',
-        prefixIcon: Icon(Icons.payments_outlined),
-        border: OutlineInputBorder(),
+        hintText: '15000',
+        prefixIcon: Icon(Icons.payments_outlined, size: 20),
       ),
       validator: (String? value) {
         final int? parsed = int.tryParse(value?.trim() ?? '');
@@ -647,10 +632,9 @@ class _AddInventoryScreenState extends State<AddInventoryScreen> {
       keyboardType: TextInputType.number,
       onChanged: (_) => setState(() {}),
       decoration: const InputDecoration(
-        labelText: 'Harga Jual Warung (Rp) *',
-        hintText: 'Contoh: 18000',
-        prefixIcon: Icon(Icons.sell_outlined),
-        border: OutlineInputBorder(),
+        labelText: 'Harga Jual (Rp) *',
+        hintText: '18000',
+        prefixIcon: Icon(Icons.sell_outlined, size: 20),
       ),
       validator: (String? value) {
         final int? sell = int.tryParse(value?.trim() ?? '');
@@ -659,7 +643,7 @@ class _AddInventoryScreenState extends State<AddInventoryScreen> {
           return 'Masukkan angka > 0';
         }
         if (buy != null && sell < buy) {
-          return 'Harga jual < modal (rugi)';
+          return 'Harga jual < modal';
         }
         return null;
       },
@@ -673,9 +657,8 @@ class _AddInventoryScreenState extends State<AddInventoryScreen> {
       onChanged: (_) => setState(() {}),
       decoration: const InputDecoration(
         labelText: 'Jumlah Stok (Unit) *',
-        hintText: 'Contoh: 24',
-        prefixIcon: Icon(Icons.numbers),
-        border: OutlineInputBorder(),
+        hintText: '24',
+        prefixIcon: Icon(Icons.numbers, size: 20),
       ),
       validator: (String? value) {
         final int? qty = int.tryParse(value?.trim() ?? '');
@@ -686,26 +669,69 @@ class _AddInventoryScreenState extends State<AddInventoryScreen> {
       },
     );
   }
+}
 
-  Widget _buildCalcItem(
-    String label,
-    String value, {
-    bool isPositive = true,
-  }) {
+class _QuickMarginChip extends StatelessWidget {
+  const _QuickMarginChip({
+    required this.label,
+    required this.onPressed,
+  });
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionChip(
+      label: Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      onPressed: onPressed,
+      visualDensity: VisualDensity.compact,
+      backgroundColor: const Color(0xFFF3F4F6),
+      side: const BorderSide(color: Color(0xFFE5E7EB)),
+    );
+  }
+}
+
+class _CalcItem extends StatelessWidget {
+  const _CalcItem({
+    required this.label,
+    required this.value,
+    this.isPositive = true,
+  });
+
+  final String label;
+  final String value;
+  final bool isPositive;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(
           label,
-          style: Theme.of(context).textTheme.labelSmall,
+          style: GoogleFonts.inter(
+            fontSize: 11,
+            color: const Color(0xFF9CA3AF),
+          ),
         ),
+        const SizedBox(height: 2),
         Text(
           value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: isPositive ? Colors.green.shade800 : Colors.red.shade700,
-              ),
+          style: GoogleFonts.inter(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: isPositive
+                ? const Color(0xFF059669)
+                : const Color(0xFFDC2626),
+          ),
         ),
       ],
     );
