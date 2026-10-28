@@ -10,20 +10,19 @@ import '../services/product_api_service.dart';
 /// UI → State/Provider → Repository → Service/Data Source → REST API / Database.
 class MerchantRepository {
   MerchantRepository({
-    required ProductApiService apiService,
-    required MerchantDatabaseService databaseService,
-  })  : _apiService = apiService,
-        _databaseService = databaseService;
+    required this.apiService,
+    required this.databaseService,
+  });
 
-  final ProductApiService _apiService;
-  final MerchantDatabaseService _databaseService;
+  final ProductApiService apiService;
+  final MerchantDatabaseService databaseService;
 
-  bool get isCloudDatabaseActive => _databaseService.isCloudActive;
+  bool get isCloudDatabaseActive => databaseService.isCloudActive;
 
   Future<List<SupplierProduct>> getCatalogProducts({
     bool forceNetworkError = false,
   }) {
-    return _apiService.fetchSupplierProducts(
+    return apiService.fetchSupplierProducts(
       forceNetworkError: forceNetworkError,
     );
   }
@@ -31,20 +30,20 @@ class MerchantRepository {
   Future<List<MerchantItem>> getInventoryItems({
     bool forceDatabaseError = false,
   }) {
-    return _databaseService.getInventoryItems(
+    return databaseService.getInventoryItems(
       forceDatabaseError: forceDatabaseError,
     );
   }
 
   Future<MerchantItem> createInventoryItem(MerchantItem item) {
-    return _databaseService.createInventoryItem(item);
+    return databaseService.createInventoryItem(item);
   }
 
   Future<MerchantItem> updateInventoryItem(int id, MerchantItem item) {
-    return _databaseService.updateInventoryItem(id, item);
+    return databaseService.updateInventoryItem(id, item);
   }
 
   Future<void> deleteInventoryItem(int id) {
-    return _databaseService.deleteInventoryItem(id);
+    return databaseService.deleteInventoryItem(id);
   }
 }

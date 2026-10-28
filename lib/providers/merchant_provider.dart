@@ -26,10 +26,9 @@ enum CatalogSortOption {
 ///    - Filter pencarian, kategori, pengurutan katalog, dan filter status stok lapak
 ///    - Produk supplier yang dipilih untuk ditambahkan cepat ke form stok lapak.
 class MerchantProvider extends ChangeNotifier {
-  MerchantProvider({required MerchantRepository repository})
-      : _repository = repository;
+  MerchantProvider({required this.repository});
 
-  final MerchantRepository _repository;
+  final MerchantRepository repository;
 
   // ==================== STATE KATALOG REST API ====================
   List<SupplierProduct> _catalogProducts = <SupplierProduct>[];
@@ -50,7 +49,7 @@ class MerchantProvider extends ChangeNotifier {
   bool get isLoadingInventory => _isLoadingInventory;
   bool get isSubmitting => _isSubmitting;
   String? get inventoryError => _inventoryError;
-  bool get isCloudDatabaseActive => _repository.isCloudDatabaseActive;
+  bool get isCloudDatabaseActive => repository.isCloudDatabaseActive;
 
   // ==================== SHARED STATE (FAVORITES & FILTERS) ====================
   final Set<int> _bookmarkedProductIds = <int>{16, 20};
@@ -229,7 +228,7 @@ class MerchantProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _catalogProducts = await _repository.getCatalogProducts(
+      _catalogProducts = await repository.getCatalogProducts(
         forceNetworkError: simulateError,
       );
     } catch (e) {
@@ -247,7 +246,7 @@ class MerchantProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _inventoryItems = await _repository.getInventoryItems(
+      _inventoryItems = await repository.getInventoryItems(
         forceDatabaseError: simulateError,
       );
     } catch (e) {
@@ -264,7 +263,7 @@ class MerchantProvider extends ChangeNotifier {
     notifyListeners();
     try {
       final MerchantItem created =
-          await _repository.createInventoryItem(newItem);
+          await repository.createInventoryItem(newItem);
       _inventoryItems = <MerchantItem>[created, ..._inventoryItems];
       _draftSupplierProduct = null;
       return created;
@@ -280,7 +279,7 @@ class MerchantProvider extends ChangeNotifier {
     notifyListeners();
     try {
       final MerchantItem saved =
-          await _repository.updateInventoryItem(id, updatedItem);
+          await repository.updateInventoryItem(id, updatedItem);
       final int idx =
           _inventoryItems.indexWhere((MerchantItem item) => item.id == id);
       if (idx != -1) {
@@ -323,7 +322,7 @@ class MerchantProvider extends ChangeNotifier {
     _isSubmitting = true;
     notifyListeners();
     try {
-      await _repository.deleteInventoryItem(id);
+      await repository.deleteInventoryItem(id);
       _inventoryItems =
           _inventoryItems.where((MerchantItem item) => item.id != id).toList();
     } finally {

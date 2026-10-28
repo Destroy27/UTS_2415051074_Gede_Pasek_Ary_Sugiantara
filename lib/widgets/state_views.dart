@@ -32,9 +32,9 @@ class LoadingStateView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            const ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 420),
-              child: IdentityHeader(dense: true),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: const IdentityHeader(dense: true),
             ),
           ],
         ),

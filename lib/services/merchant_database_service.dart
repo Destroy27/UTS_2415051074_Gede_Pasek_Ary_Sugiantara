@@ -120,7 +120,6 @@ class MerchantDatabaseService {
     }
 
     isCloudActive = false;
-    await Future<void>.delayed(const Duration(milliseconds: 250));
     final List<MerchantItem> sorted = List<MerchantItem>.from(_localItems)
       ..sort((MerchantItem a, MerchantItem b) => (b.id ?? 0).compareTo(a.id ?? 0));
     return sorted;
@@ -142,7 +141,6 @@ class MerchantDatabaseService {
       }
     }
 
-    await Future<void>.delayed(const Duration(milliseconds: 220));
     final MerchantItem created = item.copyWith(
       id: _nextLocalId++,
       createdAt: DateTime.now(),
@@ -168,7 +166,6 @@ class MerchantDatabaseService {
       }
     }
 
-    await Future<void>.delayed(const Duration(milliseconds: 200));
     final int index =
         _localItems.indexWhere((MerchantItem element) => element.id == id);
     final MerchantItem updatedItem = item.copyWith(
@@ -198,7 +195,6 @@ class MerchantDatabaseService {
       }
     }
 
-    await Future<void>.delayed(const Duration(milliseconds: 180));
     _localItems.removeWhere((MerchantItem element) => element.id == id);
   }
 }
